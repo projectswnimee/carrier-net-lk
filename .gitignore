@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.lic
+secrets/
+
+# Proprietary or bulky virtual-appliance media
+*.qcow
+*.qcow2
+*.img
+*.iso
+*.ova
+*.ovf
+*.vmdk
+*.vdi
+*.backup
+
+# Local GNS3 runtime state
+.gns3/
+project-files/qemu/
+project-files/docker/
+*.log
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary measurement data
+*.tmp
+*.bak
+~$*

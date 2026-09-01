@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="820" viewBox="0 0 1440 820" role="img" aria-labelledby="title desc">
+  <title id="title">CarrierNet-LK logical topology</title>
+  <desc id="desc">Two provider edge routers connect through two core routers in a redundant diamond. Two isolated customers each connect a site on both provider edges and reuse the same LAN prefixes.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.14"/>
+    </filter>
+    <marker id="arrow-none" markerWidth="1" markerHeight="1" refX="0" refY="0"/>
+    <style>
+      .title{font:700 30px 'Segoe UI',Arial,sans-serif;fill:#0f172a}.subtitle{font:400 15px 'Segoe UI',Arial,sans-serif;fill:#475569}
+      .nodeTitle{font:700 16px 'Segoe UI',Arial,sans-serif;fill:#0f172a}.nodeSub{font:500 12px 'Segoe UI',Arial,sans-serif;fill:#334155}
+      .edge{fill:none;stroke:#475569;stroke-width:4;stroke-linecap:round}.core{stroke:#2563eb;stroke-width:6}.custA{stroke:#16a34a}.custB{stroke:#7c3aed}
+      .label{font:600 11px 'Segoe UI',Arial,sans-serif;fill:#334155}.small{font:500 11px 'Segoe UI',Arial,sans-serif;fill:#64748b}
+    </style>
+  </defs>
+
+  <rect width="1440" height="820" fill="#f8fafc"/>
+  <text x="720" y="46" text-anchor="middle" class="title">CarrierNet-LK · Logical Topology</text>
+  <text x="720" y="72" text-anchor="middle" class="subtitle">Fictional educational IP/MPLS L3VPN lab · Provider AS65000</text>
+
+  <rect x="26" y="90" width="1388" height="210" rx="24" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"/>
+  <text x="48" y="119" class="label" fill="#166534">CUSTOMER A · VRF-CUST-A · RD/RT 65000:100</text>
+  <rect x="26" y="580" width="1388" height="210" rx="24" fill="#faf5ff" stroke="#e9d5ff" stroke-width="2"/>
+  <text x="48" y="609" class="label" fill="#6b21a8">CUSTOMER B · VRF-CUST-B · RD/RT 65000:200</text>
+  <rect x="410" y="116" width="620" height="506" rx="30" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="8 8"/>
+  <text x="720" y="145" text-anchor="middle" class="label" fill="#1d4ed8">PROVIDER CORE · OSPF AREA 0 · MPLS/LDP</text>
+
+  <!-- Customer and provider links -->
+  <path d="M174 200 H260" class="edge custA"/>
+  <path d="M386 200 L485 344" class="edge custA"/>
+  <path d="M954 344 L1054 200" class="edge custA"/>
+  <path d="M1180 200 H1266" class="edge custA"/>
+
+  <path d="M174 686 H260" class="edge custB"/>
+  <path d="M386 686 L485 476" class="edge custB"/>
+  <path d="M954 476 L1054 686" class="edge custB"/>
+  <path d="M1180 686 H1266" class="edge custB"/>
+
+  <!-- Redundant provider diamond -->
+  <path d="M610 368 L661 247" class="edge core"/>
+  <path d="M779 247 L830 368" class="edge core"/>
+  <path d="M610 452 L661 531" class="edge core"/>
+  <path d="M779 531 L830 452" class="edge core"/>
+
+  <!-- Link labels -->
+  <g>
+    <rect x="493" y="272" width="105" height="20" rx="8" fill="white" opacity="0.92"/><text x="545" y="286" text-anchor="middle" class="small">10.0.0.0/31</text>
+    <rect x="842" y="272" width="105" height="20" rx="8" fill="white" opacity="0.92"/><text x="894" y="286" text-anchor="middle" class="small">10.0.0.2/31</text>
+    <rect x="493" y="516" width="105" height="20" rx="8" fill="white" opacity="0.92"/><text x="545" y="530" text-anchor="middle" class="small">10.0.0.4/31</text>
+    <rect x="842" y="516" width="105" height="20" rx="8" fill="white" opacity="0.92"/><text x="894" y="530" text-anchor="middle" class="small">10.0.0.6/31</text>
+  </g>
+
+  <!-- Nodes -->
+  <g filter="url(#shadow)">
+    <rect x="48" y="157" width="126" height="86" rx="16" fill="white" stroke="#16a34a" stroke-width="3"/>
+    <text x="111" y="187" text-anchor="middle" class="nodeTitle">Host-A1</text><text x="111" y="210" text-anchor="middle" class="nodeSub">10.10.10.10/24</text><text x="111" y="228" text-anchor="middle" class="small">Site 1</text>
+    <rect x="260" y="157" width="126" height="86" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+    <text x="323" y="187" text-anchor="middle" class="nodeTitle">CE-A1</text><text x="323" y="210" text-anchor="middle" class="nodeSub">AS65101</text><text x="323" y="228" text-anchor="middle" class="small">FRRouting</text>
+
+    <rect x="485" y="350" width="125" height="110" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="4"/>
+    <text x="547" y="386" text-anchor="middle" class="nodeTitle">PE-CMB</text><text x="547" y="411" text-anchor="middle" class="nodeSub">10.255.0.1/32</text><text x="547" y="433" text-anchor="middle" class="small">CHR · AS65000</text>
+    <rect x="661" y="181" width="118" height="80" rx="18" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+    <text x="720" y="211" text-anchor="middle" class="nodeTitle">P-KDY</text><text x="720" y="234" text-anchor="middle" class="nodeSub">10.255.0.2/32</text><text x="720" y="251" text-anchor="middle" class="small">P router</text>
+    <rect x="661" y="515" width="118" height="80" rx="18" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+    <text x="720" y="545" text-anchor="middle" class="nodeTitle">P-GLE</text><text x="720" y="568" text-anchor="middle" class="nodeSub">10.255.0.3/32</text><text x="720" y="585" text-anchor="middle" class="small">P router</text>
+    <rect x="830" y="350" width="125" height="110" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="4"/>
+    <text x="892" y="386" text-anchor="middle" class="nodeTitle">PE-JAF</text><text x="892" y="411" text-anchor="middle" class="nodeSub">10.255.0.4/32</text><text x="892" y="433" text-anchor="middle" class="small">CHR · AS65000</text>
+
+    <rect x="1054" y="157" width="126" height="86" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+    <text x="1117" y="187" text-anchor="middle" class="nodeTitle">CE-A2</text><text x="1117" y="210" text-anchor="middle" class="nodeSub">AS65102</text><text x="1117" y="228" text-anchor="middle" class="small">probe 192.0.2.100</text>
+    <rect x="1266" y="157" width="126" height="86" rx="16" fill="white" stroke="#16a34a" stroke-width="3"/>
+    <text x="1329" y="187" text-anchor="middle" class="nodeTitle">Host-A2</text><text x="1329" y="210" text-anchor="middle" class="nodeSub">10.10.20.10/24</text><text x="1329" y="228" text-anchor="middle" class="small">Site 2</text>
+
+    <rect x="48" y="643" width="126" height="86" rx="16" fill="white" stroke="#7c3aed" stroke-width="3"/>
+    <text x="111" y="673" text-anchor="middle" class="nodeTitle">Host-B1</text><text x="111" y="696" text-anchor="middle" class="nodeSub">10.10.10.10/24</text><text x="111" y="714" text-anchor="middle" class="small">Site 1</text>
+    <rect x="260" y="643" width="126" height="86" rx="16" fill="#f3e8ff" stroke="#7c3aed" stroke-width="3"/>
+    <text x="323" y="673" text-anchor="middle" class="nodeTitle">CE-B1</text><text x="323" y="696" text-anchor="middle" class="nodeSub">AS65201</text><text x="323" y="714" text-anchor="middle" class="small">FRRouting</text>
+    <rect x="1054" y="643" width="126" height="86" rx="16" fill="#f3e8ff" stroke="#7c3aed" stroke-width="3"/>
+    <text x="1117" y="673" text-anchor="middle" class="nodeTitle">CE-B2</text><text x="1117" y="696" text-anchor="middle" class="nodeSub">AS65202</text><text x="1117" y="714" text-anchor="middle" class="small">probe 198.51.100.100</text>
+    <rect x="1266" y="643" width="126" height="86" rx="16" fill="white" stroke="#7c3aed" stroke-width="3"/>
+    <text x="1329" y="673" text-anchor="middle" class="nodeTitle">Host-B2</text><text x="1329" y="696" text-anchor="middle" class="nodeSub">10.10.20.10/24</text><text x="1329" y="714" text-anchor="middle" class="small">Site 2</text>
+  </g>
+
+  <text x="720" y="778" text-anchor="middle" class="small">Customer LAN prefixes deliberately overlap · P routers carry labels but no customer routes</text>
+</svg>

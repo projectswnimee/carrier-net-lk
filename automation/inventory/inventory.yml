@@ -1,0 +1,58 @@
+---
+# Design inventory only. `verified: false` prevents planned values from being
+# mistaken for discovered live state.
+provider:
+  asn: 65000
+  routers:
+    pe-cmb:
+      role: pe
+      platform: mikrotik_chr
+      loopback: 10.255.0.1
+      verified: false
+    p-kdy:
+      role: p
+      platform: mikrotik_chr
+      loopback: 10.255.0.2
+      verified: false
+    p-gle:
+      role: p
+      platform: mikrotik_chr
+      loopback: 10.255.0.3
+      verified: false
+    pe-jaf:
+      role: pe
+      platform: mikrotik_chr
+      loopback: 10.255.0.4
+      verified: false
+
+customers:
+  customer_a:
+    vrf: VRF-CUST-A
+    rd: "65000:100"
+    import_rt: "65000:100"
+    export_rt: "65000:100"
+    sites:
+      ce-a1:
+        asn: 65101
+        lan: 10.10.10.0/24
+        verified: false
+      ce-a2:
+        asn: 65102
+        lan: 10.10.20.0/24
+        isolation_probe: 192.0.2.100/32
+        verified: false
+  customer_b:
+    vrf: VRF-CUST-B
+    rd: "65000:200"
+    import_rt: "65000:200"
+    export_rt: "65000:200"
+    sites:
+      ce-b1:
+        asn: 65201
+        lan: 10.10.10.0/24
+        verified: false
+      ce-b2:
+        asn: 65202
+        lan: 10.10.20.0/24
+        isolation_probe: 198.51.100.100/32
+        verified: false
