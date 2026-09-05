@@ -13,6 +13,28 @@ telecommunications operator.
 
 ![CarrierNet-LK logical topology](topology/logical-topology.svg)
 
+## Build and verification evidence
+
+<p align="center">
+  <a href="evidence/screenshots/carriernet-lk-gns3-20260904.png"><img src="evidence/screenshots/carriernet-lk-gns3-20260904.png" width="560" alt="Original CarrierNet-LK GNS3 screenshot showing the 12-node lab"></a>
+</p>
+
+Original GNS3 capture from 4 September 2026. Browse the
+[screenshot context](evidence/screenshots/README.md),
+[recorded protocol outputs](evidence/command-outputs/), and
+[test register](results/test-results.csv) for the supporting evidence.
+
+| Verification area | Inspect the recorded output |
+|---|---|
+| IS-IS underlay | [PE1 neighbours](evidence/command-outputs/UND-002-PE1-isis.txt) |
+| MPLS transport | [LDP neighbours](evidence/command-outputs/MPLS-001-PE1-ldp.txt) · [forwarding table](evidence/command-outputs/MPLS-002-PE1-lfib.txt) |
+| VPN control and data plane | [VPN routes](evidence/command-outputs/VPN-003-PE1-vpn-routes.txt) · [customer ping](evidence/command-outputs/VPN-004-PC-A1-ping.txt) |
+| Resilience and recovery | [P1 failure record](evidence/command-outputs/RES-001-P1-failure.txt) · [PE1 restart recovery](evidence/command-outputs/REC-002-PE1-recovery.txt) |
+
+The separate [NetOps Automator evidence pack](https://github.com/projectswnimee/netops-automator/tree/main/docs/evidence)
+contains the recorded eight-router audit: 72 passing checks and an eight-device
+unchanged configuration-baseline comparison.
+
 ## What was built
 
 | Layer | Implementation | Validated result |
