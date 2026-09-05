@@ -1,76 +1,57 @@
 # Protocol design
 
-## Control and forwarding layers
+## Layered control plane
 
-| Layer | Protocol or mechanism | Scope | Purpose |
-|---|---|---|---|
-| Underlay | OSPFv2 area 0 | P and PE provider links | Reach all provider loopbacks through either core path |
-| Transport | MPLS + LDP | Provider-facing interfaces only | Build label-switched paths to provider loopbacks |
-| VPN control plane | MP-BGP VPNv4 | PE-CMB ↔ PE-JAF loopbacks | Exchange labelled customer VPN routes |
-| Tenant isolation | VRFs + route targets | PEs only | Maintain independent routing tables for Customers A and B |
-| Access routing | eBGP IPv4 unicast | Each PE-CE link, inside its VRF | Exchange site LAN and VPN routes |
-| Data plane | Two-label MPLS stack where required | PE-to-PE across P routers | Carry tenant traffic over shared core links |
+| Layer | Technology | Function |
+|---|---|---|
+| Underlay | IS-IS level 2 | Advertises provider links and loopbacks |
+| Transport | MPLS + LDP | Allocates and distributes labels for provider routes |
+| VPN control plane | MP-BGP IPv4 VPN | Exchanges labelled customer routes between PE loopbacks |
+| Tenant separation | Linux VRFs + route targets | Maintains independent customer routing tables |
+| Access routing | PE-CE eBGP | Exchanges customer LAN prefixes at each site |
 
-## OSPF underlay
+## IS-IS underlay
 
-- One OSPFv2 instance in area 0 on all provider routers.
-- Router IDs are the provider loopback addresses.
-- Loopbacks are passive; only four core links form adjacencies.
-- Both PE-to-PE paths start with equal total cost.
-- Customer interfaces are excluded from provider OSPF.
+All provider routers are in area `49.0001` and operate as level-2-only nodes.
+Provider links use point-to-point network type. Loopbacks are advertised as
+stable `/32` identities for LDP and MP-BGP.
 
-Phase gate: all expected OSPF adjacencies must be Full and every provider
-loopback must remain reachable after either single core path is removed.
+The five core links produce two equal-cost next hops from PE1 toward PE2's
+loopback. Customer-facing links are excluded from IS-IS.
 
 ## MPLS and LDP
 
-- Enable MPLS forwarding and LDP only on core interfaces.
-- Use each provider loopback as the LSR ID and LDP transport address.
-- Do not enable LDP on `ether3` or `ether4` of either PE.
-- Verify local/remote mappings and forwarding entries before MP-BGP.
+Each router uses its loopback as the LDP router ID and transport address. LDP
+runs only on provider-facing interfaces. The Linux kernel must have MPLS input
+enabled on those interfaces and a non-zero platform label space.
 
-Stable loopback transport prevents an individual link failure from changing the
-LDP session identity. LDP depends on the OSPF-resolved loopback path, so an
-underlay defect must be fixed before troubleshooting labels.
+When forwarding VPN traffic, the outer label carries the packet to the remote
+PE. The inner VPN label identifies the destination VRF at that PE.
 
-## MP-BGP VPNv4
+## MP-BGP VPN routes
 
-- Direct iBGP between `10.255.0.1` and `10.255.0.4` in AS65000.
-- Activate the VPNv4 address family and exchange extended communities.
-- Set the update source/local address to the PE loopback.
-- Export each VRF's eligible BGP routes with its RD and RT.
-- Resolve remote VPN next hops through the labelled provider underlay.
+PE1 and PE2 establish an iBGP session in AS65000 using their loopbacks. The
+IPv4 VPN address family carries customer prefixes, RDs, RT extended communities
+and VPN labels.
 
-P routers do not run BGP and must never learn customer routes.
+- Customer A imports and exports RT `65000:100`.
+- Customer B imports and exports RT `65000:200`.
+- Unique per-PE RDs preserve distinct VPN NLRIs.
 
-## VRFs and PE-CE eBGP
+P1 and P2 do not participate in MP-BGP and do not need customer routes.
 
-- `VRF-CUST-A`: interfaces `PE-CMB/ether3` and `PE-JAF/ether3`, RD/RT `65000:100`.
-- `VRF-CUST-B`: interfaces `PE-CMB/ether4` and `PE-JAF/ether4`, RD/RT `65000:200`.
-- CE site LANs are originated into their local eBGP session.
-- Import policy admits only the matching customer RT.
-- No route leaking exists between the two VRFs.
+## PE-CE eBGP
 
-Using a unique private AS for each CE avoids needing AS override in version 1.
-This is a deliberate simplification, not a hidden workaround.
+Customer A uses AS65100 at both sites; Customer B uses AS65200 at both sites.
+Each CE advertises only the exact LAN prefix present in its RouterOS
+`BGP-NETWORKS` address list.
 
-## QoS (later phase)
+The PE applies `as-override` when advertising a remote-site route. Without it,
+a CE would reject the remote route because its own customer AS already appears
+in the AS path.
 
-Classification and marking occur at the customer-facing PE edge. Tests will
-create voice-like UDP, business-critical traffic, and best-effort bulk traffic,
-then introduce a measured bottleneck. QoS claims require before/after latency,
-jitter, loss, and throughput data. The CHR free licence's 1 Mbps interface limit
-is a lab constraint and must be included in the analysis.
+## Route selection and isolation
 
-## Monitoring (later phase)
-
-Planned health checks cover interface state, OSPF neighbors, LDP sessions,
-MP-BGP sessions, VRF route counts, CPU/memory, and end-to-end probes. Automation
-must consume read-only credentials from untracked environment variables.
-
-## Configuration freeze
-
-No RouterOS or FRR configuration is authored in Phase 1. Before Phase 2, record
-the installed versions and validate every command against the corresponding
-official manual. Configuration exports must use deterministic filenames and
-exclude credentials.
+Customer routes are installed only in the matching PE VRF. Identical prefixes
+can therefore have different next hops and labels without conflict. RT policy,
+not the RD, decides which VRF imports a VPN route.

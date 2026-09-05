@@ -1,114 +1,128 @@
 # CarrierNet-LK
 
-**Resilient Multi-Tenant IP/MPLS L3VPN Service-Provider Core**
+**Resilient multi-tenant IP/MPLS L3VPN service-provider lab**
 
-CarrierNet-LK is an educational service-provider lab for learning and proving
-OSPF, MPLS/LDP, MP-BGP VPNv4, VRFs, PE-CE eBGP, failure recovery, QoS, and
-operational verification. It is a fictional topology and **is not the real
-network design of Dialog, SLT-Mobitel, Hutch, or any other operator**.
+CarrierNet-LK is a 12-node GNS3 lab that demonstrates how a service provider
+can carry two customers with overlapping IPv4 address space across a shared,
+redundant MPLS core. The implementation uses IS-IS for the underlay, LDP for
+label distribution, MP-BGP for VPN route exchange, Linux VRFs for tenant
+isolation, and eBGP at the provider/customer boundary.
 
-> Status: Phase 1 design scaffold complete. GNS3 and the lab appliances are not
-> yet installed or verified. No MPLS configurations or measured results are
-> claimed at this stage.
+The lab is fictional and does not represent the internal network of a real
+telecommunications operator.
 
-This is a new repository. Its predecessor,
-[Sri-Lanka-Telco-Core](https://github.com/projectswnimee/Sri-Lanka-Telco-Core),
-is used only as a reference for evidence-backed testing, reproducible
-configurations, and documentation style. CarrierNet-LK moves beyond Packet
-Tracer to a platform capable of a genuine MPLS L3VPN control and data plane.
-The specific carry-forward decisions are documented in
-[`docs/predecessor-review.md`](docs/predecessor-review.md).
+![CarrierNet-LK logical topology](topology/logical-topology.svg)
 
-## Phase 1 outcome
+## What was built
 
-| Deliverable | State | Record |
+| Layer | Implementation | Validated result |
 |---|---|---|
-| Hardware assessment | Provisional pass | [`docs/hardware-assessment.md`](docs/hardware-assessment.md) |
-| Platform decision | Selected; installation pending | [`docs/platform-decision.md`](docs/platform-decision.md) |
-| Logical topology and interface map | Reviewed design | [`docs/architecture.md`](docs/architecture.md) |
-| IP, AS, VRF, RD, and RT plan | Reviewed design | [`docs/addressing-plan.md`](docs/addressing-plan.md) |
-| Repository scaffold | Complete | This repository |
-| Installation verification | Not run | [`docs/installation-verification.md`](docs/installation-verification.md) |
-| Project scope | Complete | [`docs/scope.md`](docs/scope.md) |
+| Emulation | GNS3 2.2.61 with GNS3 VM on VMware Workstation | 12 nodes and 13 links operated together |
+| Provider underlay | Four FRRouting 10.3 routers using level-2 IS-IS | All expected adjacencies and loopback routes formed |
+| MPLS transport | LDP with loopback router IDs and ECMP core paths | Operational LDP neighbours and populated LFIB |
+| VPN control plane | MP-BGP IPv4 VPN between PE1 and PE2 in AS65000 | Four VPN routes exchanged with labels and RTs |
+| Tenant isolation | `CUST-A` table 100 and `CUST-B` table 200 | Overlapping LAN prefixes coexist in separate VRFs |
+| Customer access | Four MikroTik CHR 7.22.1 CEs using eBGP | All PE-CE sessions established |
+| Data plane | Four VPCS endpoints | Site-to-site pings passed for both customers |
+| Resilience | Two independent PE-to-PE core paths | Traffic recovered after either P router was stopped |
+| Recovery automation | Persistent FRRDocker startup scripts | IS-IS, LDP, MPLS sysctls and PE VRFs recovered after restart |
 
-## Planned topology
+## Topology
+
+The provider core has five links, giving each PE two principal paths to the
+remote PE:
 
 ```mermaid
 flowchart LR
-    HA1[Host-A1\n10.10.10.10/24] --- CEA1[CE-A1\nAS65101]
-    HB1[Host-B1\n10.10.10.10/24] --- CEB1[CE-B1\nAS65201]
+    PCA1[PC-A1\n10.10.10.10/24] --- CEA1[CE-A1\nAS65100]
+    PCB1[PC-B1\n10.10.10.10/24] --- CEB1[CE-B1\nAS65200]
+    CEA1 --- PE1
+    CEB1 --- PE1
 
-    CEA1 --- PEC[PE-CMB\nAS65000]
-    CEB1 --- PEC
-    PEC --- PK[P-KDY]
-    PEC --- PG[P-GLE]
-    PK --- PEJ[PE-JAF\nAS65000]
-    PG --- PEJ
+    PE1[PE1\n10.255.0.1/32] --- P1[P1\n10.255.0.2/32]
+    P1 --- P2[P2\n10.255.0.3/32]
+    P2 --- PE2[PE2\n10.255.0.4/32]
+    PE1 --- P2
+    P1 --- PE2
 
-    PEJ --- CEA2[CE-A2\nAS65102]
-    PEJ --- CEB2[CE-B2\nAS65202]
-    CEA2 --- HA2[Host-A2\n10.10.20.10/24]
-    CEB2 --- HB2[Host-B2\n10.10.20.10/24]
+    PE2 --- CEA2[CE-A2\nAS65100]
+    PE2 --- CEB2[CE-B2\nAS65200]
+    CEA2 --- PCA2[PC-A2\n10.10.20.10/24]
+    CEB2 --- PCB2[PC-B2\n10.10.20.10/24]
 ```
 
-The two core paths form the required provider diamond. Customer A and Customer
-B deliberately reuse `10.10.10.0/24` and `10.10.20.0/24`; their routes remain
-separate because each customer is placed in a distinct VRF.
+- Customer A uses RT `65000:100`.
+- Customer B uses RT `65000:200`.
+- Each PE uses a unique RD per customer site.
+- P1 and P2 carry provider routes and labels; they do not hold customer VRFs.
+- Customers intentionally reuse `10.10.10.0/24` and `10.10.20.0/24`.
 
-## Baseline design
+## Key engineering decisions
 
-- Provider AS: `65000`
-- Underlay: OSPF area 0 over four `/31` links
-- Transport: MPLS with LDP on provider-facing links only
-- Service control plane: direct MP-BGP VPNv4 between PE loopbacks
-- Customer service: two VRFs and PE-CE eBGP
-- Customer A: `VRF-CUST-A`, RD/RT `65000:100`
-- Customer B: `VRF-CUST-B`, RD/RT `65000:200`
-- Provider nodes: four MikroTik CHR RouterOS v7 VMs
-- Customer edges: four lightweight FRRouting containers
-- End hosts: four VPCS nodes
-
-## Build order
-
-1. Verify the Windows host, hypervisor, GNS3 VM, and appliance versions.
-2. Build and cable the topology exactly as documented.
-3. Configure interface state and point-to-point addresses.
-4. Prove IP reachability and OSPF before enabling MPLS.
-5. Add LDP and prove label-switched paths.
-6. Add MP-BGP VPNv4, VRFs, and PE-CE eBGP.
-7. Prove reachability, isolation, overlapping addressing, and P-router route hygiene.
-8. Run measured failure and QoS experiments.
-
-Do not skip layers. Each phase has explicit pass/fail gates in
-[`docs/test-plan.md`](docs/test-plan.md).
+- `/31` subnets conserve addresses on point-to-point provider links.
+- `/32` loopbacks provide stable IS-IS, LDP and MP-BGP identities.
+- Separate RTs prevent route exchange between customers.
+- `as-override` supports two sites using the same customer AS.
+- MPLS is enabled only on provider-facing links.
+- The P routers remain unaware of customer IPv4 prefixes.
+- Recovery hooks restore container state that FRRDocker does not retain at runtime.
 
 ## Repository map
 
 | Path | Purpose |
 |---|---|
-| `topology/` | Draw.io source, SVG, and rendered PNG |
-| `configs/` | Version-controlled device exports added phase by phase |
-| `docs/` | Architecture, plans, procedures, limits, and analysis |
-| `automation/` | Inventory, health checks, and automated tests |
-| `evidence/` | Raw command output, captures, screenshots, and measurements |
-| `results/test-results.csv` | Test register; `not_run` is used until evidence exists |
+| [`lab/`](lab/) | GNS3 project definition without proprietary appliance images |
+| [`topology/`](topology/) | Logical topology diagram |
+| [`configs/`](configs/) | Sanitized FRR, RouterOS and VPCS configurations |
+| [`automation/`](automation/) | Tested core and PE restart-recovery scripts |
+| [`docs/`](docs/) | Architecture, addressing, protocol design and reproduction guide |
+| [`evidence/`](evidence/) | Selected raw outputs captured during validation |
+| [`results/test-results.csv`](results/test-results.csv) | Honest pass/not-run test register |
 
-## Evidence policy
+## Reproduce the lab
 
-- Never commit router images, licence files, passwords, private keys, or tokens.
-- Never fabricate command output, packet captures, screenshots, or measurements.
-- Keep raw evidence immutable; analysis belongs in `docs/` or `results/`.
-- Every performance or resilience claim must identify its test ID and evidence path.
+1. Install GNS3 2.2.61, the matching GNS3 VM and VMware Workstation.
+2. Import MikroTik CHR 7.22.1 and the `FRRDocker` appliance.
+3. Import [`lab/CarrierNet-LK.gns3`](lab/CarrierNet-LK.gns3), or recreate the
+   links from [`docs/architecture.md`](docs/architecture.md).
+4. Apply the provider, CE and host configurations from [`configs/`](configs/).
+5. Install the recovery hook described in
+   [`automation/scripts/README.md`](automation/scripts/README.md).
+6. Run the checks in [`docs/validation.md`](docs/validation.md).
 
-## Official references
+Appliance images are deliberately excluded. Download them from their official
+sources and verify their checksums before use.
 
-- [GNS3 documentation](https://docs.gns3.com/docs)
-- [GNS3 VM usage](https://docs.gns3.com/docs-3.1-en/gns3-vm/gns3-vm-usage)
-- [MikroTik CHR](https://help.mikrotik.com/docs/spaces/ROS/pages/18350234/Cloud%20Hosted%20Router%20CHR)
-- [MikroTik LDP](https://help.mikrotik.com/docs/spaces/ROS/pages/121995275/LDP)
-- [MikroTik VRF and L3VPN](https://help.mikrotik.com/docs/spaces/ROS/pages/328206/Virtual%20Routing%20and%20Forwarding%20-%20VRF)
-- [FRRouting](https://frrouting.org/)
+## Verified highlights
 
-## Licence
+```text
+PE1# show isis neighbor
+Area CORE:
+System Id  Interface  L  State
+P1         eth0       2  Up
+P2         eth1       2  Up
 
-MIT. See [`LICENSE`](LICENSE).
+PE1# show mpls ldp neighbor
+10.255.0.2  OPERATIONAL
+10.255.0.3  OPERATIONAL
+```
+
+The PE1 VPN table contained four routes: a local and remote site prefix for
+each customer. End-to-end ICMP then passed independently in both VRFs. During
+a P-router shutdown, packet loss occurred briefly and traffic reconverged over
+the surviving labelled path.
+
+## Scope and limitations
+
+This is an educational implementation, not a production reference design. It
+does not yet include route reflectors, PE multihoming, QoS benchmarking,
+automated packet-capture analysis or timing-grade convergence measurements.
+See [`docs/limitations.md`](docs/limitations.md) for the full list.
+
+## Security and licensing
+
+- No router passwords, tokens, private keys, licence files or appliance images
+  are committed.
+- Configuration files contain private lab addresses only.
+- Code and documentation are licensed under the [MIT License](LICENSE).
+- RouterOS, FRRouting, GNS3 and VMware retain their respective licences.

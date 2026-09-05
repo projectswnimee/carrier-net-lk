@@ -1,0 +1,4 @@
+PE1# show mpls ldp neighbor
+AF   ID              State       Remote Address    Uptime
+ipv4 10.255.0.2      OPERATIONAL 10.255.0.2      00:00:31
+ipv4 10.255.0.3      OPERATIONAL 10.255.0.3      00:39:00

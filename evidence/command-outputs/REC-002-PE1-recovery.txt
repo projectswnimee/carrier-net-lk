@@ -1,0 +1,16 @@
+root@PE1:/# grep -E '^(isisd|ldpd)=' /etc/frr/daemons
+isisd=yes
+ldpd=yes
+
+root@PE1:/# cat /proc/sys/net/mpls/platform_labels
+100000
+
+root@PE1:/# ip -d link show type vrf
+CUST-A: vrf table 100, state UP
+CUST-B: vrf table 200, state UP
+
+After protocol convergence:
+- IS-IS neighbours P1 and P2 were Up.
+- MP-BGP peer 10.255.0.4 was established and exchanged two prefixes.
+- CUST-A neighbour 172.16.1.2 was established.
+- CUST-B neighbour 172.17.1.2 was established.

@@ -1,9 +1,12 @@
-# Configuration exports
+# Sanitized configurations
 
-Configuration files are intentionally absent in Phase 1. Add them only after
-the installed RouterOS/FRR versions are recorded and the preceding layer passes
-its tests.
+These files reproduce the validated lab without credentials, private keys,
+licence data or appliance binaries.
 
-Naming convention: `<device>-phase-<number>-<layer>.rsc` for RouterOS exports
-and `<device>-phase-<number>-<layer>.conf` for FRR. Exports must not include
-credentials, private keys, binary backups, or licence data.
+- `provider/`: FRRouting integrated configurations for PE1, P1, P2 and PE2.
+- `customer-edge/`: RouterOS commands for CE-A1, CE-A2, CE-B1 and CE-B2.
+- `hosts/`: VPCS startup commands.
+
+Linux VRF devices and MPLS sysctls are runtime state. Install the scripts under
+[`../automation/scripts/`](../automation/scripts/) before relying on provider
+configuration after a restart.

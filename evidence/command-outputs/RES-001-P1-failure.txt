@@ -1,0 +1,21 @@
+P1 was stopped while a Customer-A site-to-site ping was running. Brief packet
+loss was observed, followed by stable replies over P2.
+
+PE1# show isis neighbor
+Area CORE:
+System Id           Interface   L  State
+P2                  eth1        2  Up
+
+PE1# show mpls table
+Inbound Label  Type  Nexthop   Outbound Label
+---------------------------------------------
+16             LDP   10.0.0.7  implicit-null
+17             LDP   10.0.0.7  implicit-null
+18             LDP   10.0.0.7  implicit-null
+19             LDP   10.0.0.7  19
+20             LDP   10.0.0.7  implicit-null
+21             LDP   10.0.0.7  implicit-null
+144            BGP   CUST-A    -
+145            BGP   CUST-B    -
+
+MP-BGP remained established during the P1 failure.

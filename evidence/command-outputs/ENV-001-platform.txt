@@ -1,0 +1,11 @@
+Observed platform summary
+Captured: 2026-09-02
+
+GNS3 GUI/server: 2.2.61
+GNS3 VM: 2.2.61 appliance connected at 192.168.111.128
+FRRouting: 10.3
+MikroTik RouterOS: 7.22.1 stable, x86_64
+GNS3 VM kernel: 7.0.0-30-generic
+
+The GNS3 VM did not expose /dev/kvm. CHR was successfully operated with QEMU
+software emulation after setting accel=tcg.

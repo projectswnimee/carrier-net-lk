@@ -1,0 +1,4 @@
+PC-A1> ping 10.10.20.10
+
+84 bytes from 10.10.20.10 icmp_seq=1 ttl=60 time=10.148 ms
+84 bytes from 10.10.20.10 icmp_seq=2 ttl=60 time=5.338 ms

@@ -1,0 +1,16 @@
+PE1# show bgp ipv4 vpn
+     Network          Next Hop            Metric LocPrf Weight Path
+Route Distinguisher: 65000:101
+ *>  10.10.10.0/24    172.16.1.2@2<                          0 65100 i
+    UN=172.16.1.2 EC{65000:100} label=144 type=bgp, subtype=5
+Route Distinguisher: 65000:102
+ *>i 10.10.20.0/24    10.255.0.4                    100      0 65100 i
+    UN=10.255.0.4 EC{65000:100} label=144 type=bgp, subtype=0
+Route Distinguisher: 65000:201
+ *>  10.10.10.0/24    172.17.1.2@3<                          0 65200 i
+    UN=172.17.1.2 EC{65000:200} label=145 type=bgp, subtype=5
+Route Distinguisher: 65000:202
+ *>i 10.10.20.0/24    10.255.0.4                    100      0 65200 i
+    UN=10.255.0.4 EC{65000:200} label=145 type=bgp, subtype=0
+
+Displayed 4 routes and 4 total paths

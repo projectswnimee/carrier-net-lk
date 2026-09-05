@@ -1,0 +1,5 @@
+PE1# show isis neighbor
+Area CORE:
+System Id           Interface   L  State         Holdtime SNPA
+P1                  eth0        2  Up            30       2020.2020.2020
+P2                  eth1        2  Up            29       2020.2020.2020

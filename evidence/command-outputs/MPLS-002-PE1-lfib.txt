@@ -1,0 +1,13 @@
+PE1# show mpls table
+Inbound Label  Type  Nexthop   Outbound Label
+---------------------------------------------
+16             LDP   10.0.0.1  implicit-null
+16             LDP   10.0.0.7  implicit-null
+17             LDP   10.0.0.7  implicit-null
+18             LDP   10.0.0.7  implicit-null
+19             LDP   10.0.0.1  implicit-null
+20             LDP   10.0.0.1  implicit-null
+21             LDP   10.0.0.1  20
+21             LDP   10.0.0.7  20
+144            BGP   CUST-A    -
+145            BGP   CUST-B    -

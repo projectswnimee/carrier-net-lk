@@ -1,0 +1,13 @@
+* text=auto
+*.sh text eol=lf
+*.conf text eol=lf
+*.rsc text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.svg text eol=lf
+*.gns3 text eol=lf
+*.png binary
+*.pcap binary
+*.pcapng binary

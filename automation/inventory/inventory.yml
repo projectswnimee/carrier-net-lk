@@ -1,58 +1,58 @@
----
-# Design inventory only. `verified: false` prevents planned values from being
-# mistaken for discovered live state.
 provider:
   asn: 65000
+  underlay: isis-level-2
   routers:
-    pe-cmb:
+    PE1:
       role: pe
-      platform: mikrotik_chr
-      loopback: 10.255.0.1
-      verified: false
-    p-kdy:
+      platform: frrdocker
+      version: "10.3"
+      loopback: 10.255.0.1/32
+      recovery_profile: pe
+    P1:
       role: p
-      platform: mikrotik_chr
-      loopback: 10.255.0.2
-      verified: false
-    p-gle:
+      platform: frrdocker
+      version: "10.3"
+      loopback: 10.255.0.2/32
+      recovery_profile: core
+    P2:
       role: p
-      platform: mikrotik_chr
-      loopback: 10.255.0.3
-      verified: false
-    pe-jaf:
+      platform: frrdocker
+      version: "10.3"
+      loopback: 10.255.0.3/32
+      recovery_profile: core
+    PE2:
       role: pe
-      platform: mikrotik_chr
-      loopback: 10.255.0.4
-      verified: false
+      platform: frrdocker
+      version: "10.3"
+      loopback: 10.255.0.4/32
+      recovery_profile: pe
 
 customers:
-  customer_a:
-    vrf: VRF-CUST-A
-    rd: "65000:100"
-    import_rt: "65000:100"
-    export_rt: "65000:100"
+  CUST-A:
+    asn: 65100
+    route_target: "65000:100"
     sites:
-      ce-a1:
-        asn: 65101
+      CE-A1:
+        platform: mikrotik_chr
+        version: "7.22.1"
+        pe_address: 172.16.1.2/30
         lan: 10.10.10.0/24
-        verified: false
-      ce-a2:
-        asn: 65102
+      CE-A2:
+        platform: mikrotik_chr
+        version: "7.22.1"
+        pe_address: 172.16.2.2/30
         lan: 10.10.20.0/24
-        isolation_probe: 192.0.2.100/32
-        verified: false
-  customer_b:
-    vrf: VRF-CUST-B
-    rd: "65000:200"
-    import_rt: "65000:200"
-    export_rt: "65000:200"
+  CUST-B:
+    asn: 65200
+    route_target: "65000:200"
     sites:
-      ce-b1:
-        asn: 65201
+      CE-B1:
+        platform: mikrotik_chr
+        version: "7.22.1"
+        pe_address: 172.17.1.2/30
         lan: 10.10.10.0/24
-        verified: false
-      ce-b2:
-        asn: 65202
+      CE-B2:
+        platform: mikrotik_chr
+        version: "7.22.1"
+        pe_address: 172.17.2.2/30
         lan: 10.10.20.0/24
-        isolation_probe: 198.51.100.100/32
-        verified: false

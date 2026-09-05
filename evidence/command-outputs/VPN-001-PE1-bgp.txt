@@ -1,0 +1,10 @@
+PE1# show bgp ipv4 vpn summary
+BGP router identifier 10.255.0.1, local AS number 65000 VRF default vrf-id 0
+BGP table version 0
+RIB entries 7, using 896 bytes of memory
+Peers 1, using 23 KiB of memory
+
+Neighbor        V         AS   MsgRcvd   MsgSent   TblVer  InQ OutQ  Up/Down State/PfxRcd   PfxSnt
+10.255.0.4      4      65000         9         8        1    0    0 00:00:15            2        2
+
+Total number of neighbors 1
