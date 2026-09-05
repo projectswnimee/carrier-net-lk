@@ -16,10 +16,12 @@ telecommunications operator.
 ## Build and verification evidence
 
 <p align="center">
-  <a href="evidence/screenshots/carriernet-lk-gns3-20260904.png"><img src="evidence/screenshots/carriernet-lk-gns3-20260904.png" width="560" alt="Original CarrierNet-LK GNS3 screenshot showing the 12-node lab"></a>
+  <a href="evidence/screenshots/carriernet-lk-gns3-20260904-cropped.png"><img src="evidence/screenshots/carriernet-lk-gns3-20260904-cropped.png" width="560" alt="Cropped CarrierNet-LK GNS3 screenshot showing the unchanged 12-node topology"></a>
 </p>
 
-Original GNS3 capture from 4 September 2026. Browse the
+Lossless crop of the GNS3 capture from 4 September 2026, excluding the bottom
+console and desktop taskbar. The [uncropped original](evidence/screenshots/carriernet-lk-gns3-20260904.png)
+is retained. Browse the
 [screenshot context](evidence/screenshots/README.md),
 [recorded protocol outputs](evidence/command-outputs/), and
 [test register](results/test-results.csv) for the supporting evidence.
